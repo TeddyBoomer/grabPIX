@@ -1,7 +1,7 @@
 """PIX grabber
-v0.0.2
+v0.0.3
 
-Ce script permet d'aggréger et résumé les résultats PIX de plusieurs classes:
+Ce script permet d'aggréger et résumer les résultats PIX de plusieurs classes:
 
 1. on exporte les CSV depuis orga.pix.fr dans un même dossier
 2. on y place ce script, on l'exécute
@@ -36,8 +36,7 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from functools import reduce
-from mpl_toolkits.axes_grid1.axes_divider import make_axes_area_auto_adjustable
-
+# from mpl_toolkits.axes_grid1.axes_divider import make_axes_area_auto_adjustable
 
 data = []
 # renseigner les groupes de classes ici
@@ -70,17 +69,26 @@ df.sort_values(by=["groupe", "classe"], inplace=True)
 nbcomps = df[comps].count(axis=1)
 df.insert(20, "Nombre de compétences", nbcomps)
 
-sns.set_theme(style="whitegrid")
-plt.figure(figsize=(9,9))
-ax = sns.boxplot(x="Nombre de Pix", y="classe", data=df, palette="Set3",
-                 hue="groupe", whis=(0,100))
-# whis: réglage moustaches vers Q0=min, Q4=max
-#plt.xticks(rotation=90)
-make_axes_area_auto_adjustable(ax)
-# plt.show()
-plt.savefig("PIX.png")
 
-# export tableur
+##############
+# graphiques #
+##############
+sns.set_theme(style="whitegrid")
+for val in ["Nombre de Pix", "Nombre de compétences"]:
+    F = plt.figure(figsize=(9,9))
+    ax = F.add_axes(rect=[0.15, 0.1, 0.80, 0.85], adjustable='datalim')
+    _ = sns.boxplot(x=val, y="classe", data=df, palette="Set3",
+                     hue="groupe", whis=(0,100), ax=ax)
+    # whis: réglage moustaches vers Q0=min, Q4=max
+    #plt.xticks(rotation=90)
+    #make_axes_area_auto_adjustable(ax)
+    # plt.show()
+    plt.savefig(f"PIX-{val.replace(' ', '_')}.png")
+    del F
+
+##################
+# export tableur #
+##################
 df.set_index(["groupe", "classe"], inplace=True)
 dg = df[["Nombre de Pix", "Nombre de compétences"]]
 
