@@ -1,5 +1,5 @@
 """PIX grabber
-v0.0.3
+v0.0.4
 
 Ce script permet d'aggréger et résumer les résultats PIX de plusieurs classes:
 
@@ -51,12 +51,15 @@ comps =["1.1", "1.2", "1.3", "2.1", "2.2", "2.3", "2.4", "3.1", "3.2", "3.3",
         "3.4", "4.1", "4.2", "4.3", "5.1", "5.2"]
 # 0 et - mis à NA pour le décompte des compétences
 na_comps =dict([[e, ["-", "0"]] for e in comps]) 
+# liste des classes pour régler la hauteur des images
+classes = []
 
 for e in os.listdir("."):
     if e.endswith(".csv"):
         d = pd.read_csv(e, sep=";", usecols=["Statut", "Nombre de Pix"] + comps,
                         na_values=na_comps)
         classe = e.split("_")[2].split(".")[0] # vilaine capture classe
+        classes.append(classe)
         d.insert(2, "classe", classe)
         d.insert(3, "groupe", ginv[classe])
         data.append(d)
@@ -75,7 +78,7 @@ df.insert(20, "Nombre de compétences", nbcomps)
 ##############
 sns.set_theme(style="whitegrid")
 for val in ["Nombre de Pix", "Nombre de compétences"]:
-    F = plt.figure(figsize=(9,9))
+    F = plt.figure(figsize=(7, 1.5 + 0.5*len(classes)))
     ax = F.add_axes(rect=[0.15, 0.1, 0.80, 0.85], adjustable='datalim')
     _ = sns.boxplot(x=val, y="classe", data=df, palette="Set3",
                      hue="groupe", whis=(0,100), ax=ax)
