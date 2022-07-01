@@ -1,5 +1,5 @@
 """PIX grabber
-v0.0.4
+v0.0.5
 
 Ce script permet d'aggréger et résumer les résultats PIX de plusieurs classes:
 
@@ -98,7 +98,21 @@ dg = df[["Nombre de Pix", "Nombre de compétences"]]
 with pd.ExcelWriter("statsPIX.xlsx", engine='xlsxwriter') as writer: # xlsx
     # résumé des niveaux par groupe et classe
     dg.groupby(["groupe", "classe"]).describe().to_excel(writer,
+                                                         float_format="%.2f",
                                                          sheet_name="valides")
+
+    # résumé des niveaux par groupe
+    dg.groupby("groupe").describe().to_excel(writer,
+                                             float_format="%.2f",
+                                             sheet_name="valides",
+                                             startrow=len(classes)+4)
+
+    # résumé global des niveaux 
+    dg.describe().to_excel(writer,
+                           float_format="%.2f",
+                           sheet_name="valides",
+                           startrow=len(classes)+len(groups)+2*4)
+    
     # résumé des validés/rejetés
     a = df.groupby(["groupe", "classe"])["Statut"].value_counts()
     dh = pd.concat([a[:,:,"Validée"], a[:,:,"Rejetée"]], axis=1,
