@@ -1,5 +1,5 @@
 """PIX grabber
-v0.0.6
+v0.0.7
 
 Ce script permet d'aggréger et résumer les résultats PIX de plusieurs classes:
 
@@ -61,7 +61,8 @@ classes = []
 for e in os.listdir("."):
     if e.endswith(".csv"):
         d = pd.read_csv(e, sep=";", usecols=fields,
-                        na_values=na_comps, parse_dates=[len(fields)-1])
+                        na_values=na_comps, parse_dates=[len(fields)-1],
+                        infer_datetime_format=True, dayfirst=True)
         classe = e.split("_")[2].split(".")[0] # vilaine capture classe
         classes.append(classe)
         d.insert(2, "classe", classe)
